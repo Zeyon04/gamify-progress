@@ -3,46 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <title>Gamify Progress</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
       background: linear-gradient(to bottom, #f0f8ff, #e0f7fa);
       color: #222;
       padding: 1rem;
-      text-align: center;
     }
+
     h2 {
+      text-align: center;
       font-size: 2rem;
       margin-bottom: 1rem;
     }
-    .tasks, .controls, .checklist {
-      margin: 1rem 0;
+
+    .tasks {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
     }
-    button {
-      margin: 0.3rem;
-      padding: 0.7rem 1.2rem;
-      font-size: 1rem;
+
+    button.task-btn {
+      width: 95%;
+      padding: 1rem;
+      font-size: 1.2rem;
+      text-align: left;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
+      background-color: #4fc3f7;
+      color: #fff;
       cursor: pointer;
+      position: relative;
       transition: all 0.2s;
     }
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+
+    button.task-btn.active {
+      background-color: #0288d1;
     }
+
+    button.task-btn span.timer {
+      position: absolute;
+      right: 1rem;
+      font-weight: bold;
+    }
+
+    .checklist {
+      margin: 1rem 0;
+    }
+
+    .checklist label {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .checklist input {
+      transform: scale(1.3);
+      margin-right: 0.5rem;
+    }
+
     .status {
+      text-align: center;
       font-weight: bold;
       margin-top: 1rem;
       font-size: 1.1rem;
     }
-    .checklist label {
-      margin-right: 1rem;
-      font-size: 1rem;
+
+    .sleep-section {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
     }
-    .checklist input {
-      transform: scale(1.3);
-      margin-right: 0.3rem;
+
+    .sleep-section button {
+      width: 95%;
+      background-color: #81c784;
+    }
+
+    .sleep-section button.active {
+      background-color: #388e3c;
     }
   </style>
 </head>
@@ -51,27 +93,25 @@
 
   <!-- Botones de tareas -->
   <div class="tasks">
-    <button onclick="start('entrenar','ejercicio')">🏋️ Entrenar</button>
-    <button onclick="start('andar','ejercicio')">🚶 Andar</button>
-    <button onclick="start('estudiar','inteligencia')">📚 Estudiar</button>
-    <button onclick="start('meditar','salud_mental')">🧘 Meditar</button>
-    <button onclick="start('organizar','salud_mental')">🗂️ Organizar</button>
-    <button onclick="start('lectura','inteligencia')">📖 Lectura</button>
+    <button class="task-btn" data-task="entrenar" data-area="ejercicio">🏋️ Entrenar <span class="timer">00:00:00</span></button>
+    <button class="task-btn" data-task="andar" data-area="ejercicio">🚶 Andar <span class="timer">00:00:00</span></button>
+    <button class="task-btn" data-task="estudiar" data-area="inteligencia">📚 Estudiar <span class="timer">00:00:00</span></button>
+    <button class="task-btn" data-task="meditar" data-area="salud_mental">🧘 Meditar <span class="timer">00:00:00</span></button>
+    <button class="task-btn" data-task="organizar" data-area="salud_mental">🗂️ Organizar <span class="timer">00:00:00</span></button>
+    <button class="task-btn" data-task="lectura" data-area="inteligencia">📖 Lectura <span class="timer">00:00:00</span></button>
   </div>
 
-  <!-- Controles -->
-  <div class="controls">
-    <button onclick="stop()">⏹️ Detener</button>
-    <button onclick="exportToday()">💾 Exportar</button>
-  </div>
-
-  <!-- Checklist comida/sueño -->
+  <!-- Checklist comida/cena -->
   <div class="checklist">
     <label><input type="checkbox" id="food"> 🍎 Comida OK</label>
-    <label><input type="checkbox" id="sleep"> 🛌 Dormir ≥8h</label>
+    <label><input type="checkbox" id="dinner"> 🍽️ Cena OK</label>
   </div>
 
-  <!-- Estado actual -->
+  <!-- Cronómetro dormir -->
+  <div class="sleep-section">
+    <button id="sleepBtn">🛌 Dormir <span class="timer">00:00:00</span></button>
+  </div>
+
   <div class="status" id="status">Esperando...</div>
 
   <script src="app.js"></script>

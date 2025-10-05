@@ -1,35 +1,122 @@
 let sessions = JSON.parse(localStorage.getItem('sessions') || '[]');
-let timer = null, startTs = 0, currentTask = null;
 
-function start(task, area) {
-  if (timer) return;
-  currentTask = { area, task };
-  startTs = Date.now();
-  updateStatus(`Grabando: ${task} (${area})...`);
-  timer = setInterval(() => {
-    const mins = Math.floor((Date.now() - startTs) / 60000);
-    updateStatus(`Grabando: ${task} (${mins} min)`);
-  }, 1000);
-}
+let currentTask = null;
+let taskStart = 0;
+let taskTimer = null;
 
-function stop() {
-  if (!timer) return;
-  clearInterval(timer);
-  timer = null;
-  const mins = Math.max(1, Math.round((Date.now() - startTs) / 60000));
-  const date = new Date().toISOString().slice(0, 10);
-  sessions.push({ date, area: currentTask.area, task: currentTask.task, minutes: mins });
-  localStorage.setItem('sessions', JSON.stringify(sessions));
+let sleepStart = 0;
+let sleepTimer = null;
+
+// --- Funciones para tareas ---
+const taskButtons = document.querySelectorAll(".task-btn");
+taskButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const task = btn.dataset.task;
+    const area = btn.dataset.area;
+
+    // Si ya estaba activa, detener
+    if (currentTask && currentTask.btn === btn) {
+      stopTask();
+      return;
+    }
+
+    // Detener otra tarea si hay
+    if (currentTask) stopTask();
+
+    // Iniciar nueva tarea
+    currentTask = { task, area, btn };
+    taskStart = Date.now();
+    btn.classList.add("active");
+    updateStatus(`Grabando: ${task} (${area})...`);
+
+    taskTimer = setInterval(() => {
+      const elapsed = Date.now() - taskStart;
+      btn.querySelector(".timer").innerText = msToTime(elapsed);
+    }, 1000);
+  });
+});
+
+function stopTask() {
+  if (!currentTask) return;
+  clearInterval(taskTimer);
+
+  const elapsed = Date.now() - taskStart;
+  const mins = Math.max(1, Math.round(elapsed / 60000));
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const timestamp = now.toISOString().slice(11,19);
+
+  // Guardar o actualizar si es mayor
+  let existing = sessions.find(s => s.date === today && s.task === currentTask.task);
+  if (!existing || mins > existing.minutes) {
+    if (existing) existing.minutes = mins;
+    else sessions.push({ date: today, time: timestamp, area: currentTask.area, task: currentTask.task, minutes: mins });
+  }
+
+  currentTask.btn.classList.remove("active");
+  currentTask.btn.querySelector(".timer").innerText = "00:00:00";
   updateStatus(`Guardado ${mins} min de ${currentTask.task}`);
   currentTask = null;
 }
 
+// --- Cronómetro dormir ---
+const sleepBtn = document.getElementById("sleepBtn");
+sleepBtn.addEventListener("click", () => {
+  if (sleepTimer) {
+    stopSleep();
+    return;
+  }
+  sleepStart = Date.now();
+  sleepBtn.classList.add("active");
+  sleepTimer = setInterval(() => {
+    const elapsed = Date.now() - sleepStart;
+    sleepBtn.querySelector(".timer").innerText = msToTime(elapsed);
+  }, 1000);
+});
+
+function stopSleep() {
+  if (!sleepTimer) return;
+  clearInterval(sleepTimer);
+
+  const elapsed = Date.now() - sleepStart;
+  const mins = Math.round(elapsed / 60000);
+  sleepBtn.classList.remove("active");
+  sleepBtn.querySelector(".timer").innerText = "00:00:00";
+
+  // Guardar sueño como sesión "sleep"
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const timestamp = now.toISOString().slice(11,19);
+  let existing = sessions.find(s => s.date === today && s.task === "dormir");
+  if (!existing || mins > existing.minutes) {
+    if (existing) existing.minutes = mins;
+    else sessions.push({ date: today, time: timestamp, area: "salud_mental", task: "dormir", minutes: mins });
+  }
+
+  updateStatus(`Dormir registrado: ${mins} min`);
+  sleepTimer = null;
+}
+
+// --- Exportar ---
 function exportToday() {
-  const today = new Date().toISOString().slice(0, 10);
-  const todays = sessions.filter(s => s.date === today);
+  const today = new Date().toISOString().slice(0,10);
+  const todays = [];
+
+  sessions.forEach(s => {
+    if (s.date === today) {
+      let existing = todays.find(t => t.task === s.task);
+      if (!existing || s.minutes > existing.minutes) {
+        if (existing) Object.assign(existing, s);
+        else todays.push({...s});
+      }
+    }
+  });
+
   const food_ok = document.getElementById("food").checked;
-  const sleep_ok = document.getElementById("sleep").checked;
-  const payload = { user: "oscar", date: today, sessions: todays, food_ok, sleep_ok };
+  const sleep_ok = document.getElementById("sleepBtn").classList.contains("active") ? false : todays.some(t => t.task === "dormir" && t.minutes >= 480);
+  const dinner_ok = document.getElementById("dinner").checked;
+
+  const payload = { user: "oscar", date: today, sessions: todays, food_ok, dinner_ok, sleep_ok };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -38,6 +125,14 @@ function exportToday() {
   updateStatus("Archivo exportado ✅");
 }
 
+// --- Helpers ---
 function updateStatus(text) {
   document.getElementById("status").innerText = text;
+}
+
+function msToTime(duration) {
+  let seconds = Math.floor((duration / 1000) % 60),
+      minutes = Math.floor((duration / (1000 * 60)) % 60),
+      hours = Math.floor(duration / (1000 * 60 * 60));
+  return [hours, minutes, seconds].map(v => v.toString().padStart(2,'0')).join(':');
 }
