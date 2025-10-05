@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gamify Progress</title>
+  <style>
+    body { font-family: Arial; padding: 1rem; }
+    button { margin: 0.3rem; padding: 0.5rem 1rem; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <h2>Gamify Progress</h2>
+  <div>
+    <button onclick="start('entrenar','ejercicio')">🏋️ Entrenar</button>
+    <button onclick="start('andar','ejercicio')">🚶 Andar</button>
+    <button onclick="start('estudiar','inteligencia')">📚 Estudiar</button>
+    <button onclick="start('meditar','salud_mental')">🧘 Meditar</button>
+  </div>
+
+  <div>
+    <button onclick="stop()">⏹️ Detener</button>
+    <button onclick="exportToday(true,true)">💾 Exportar (comida y sueño OK)</button>
+  </div>
+
+  <p id="status">Esperando...</p>
+
+  <script src="app.js"></script>
+</body>
+</html>
