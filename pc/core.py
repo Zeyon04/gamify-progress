@@ -1,81 +1,144 @@
 import math, json, os
 
+# =====================
+# CONFIGURACIÓN GENERAL
+# =====================
+
 BASE_XP = {
-  "estudiar": 1.0,
-  "lectura": 0.25,
-  "entrenar": 1.0,
-  "andar": 0.25,
-  "meditar": 1.0,
-  "organizar": 1.0
+    "estudiar": 1.0,
+    "lectura": 0.25,
+    "entrenar": 1.0,
+    "andar": 0.25,
+    "meditar": 1.0,
+    "organizar": 1.0
 }
 
-PENALTY_XP = 100
-RECOVERY_DAYS = 10
-MAX_EXTRA_BUFF = 2.0  # 200%
+AREA_TASKS = {
+    "inteligencia": ["estudiar", "lectura"],
+    "ejercicio": ["entrenar", "andar"],
+    "salud_mental": ["meditar", "organizar"]
+}
 
-def buff_time(m):
-    return 0.30 * (1 - math.exp(-m/80))
+# Mínimos diarios por área
+MIN_REQ = {
+    "inteligencia": {"estudiar": 30},
+    "ejercicio": {"entrenar": 30},
+    "salud_mental": {"meditar": 10}
+}
 
-def buff_day(streak_days):
-    return min(0.10 * streak_days, 2.0)
+# Parámetros
+GLOBAL_BUFF_FOOD = 0.02
+GLOBAL_BUFF_SLEEP = 0.02
+MAX_RATE = 3.0   # 300%
+MIN_RATE = 0.0
+BASE_RATE = 1.0
+RATE_DROP = 0.10
+XP_PENALTY = 100  # XP restado cuando el rate llega a 0%
 
-BUFF_FOOD = 0.02
-BUFF_SLEEP = 0.02
+# =====================
+# FUNCIONES DE BUFFOS
+# =====================
 
-def compute_day_xp(area_state, minutes_by_task, streak_days, days_missed, food_ok, sleep_ok, penalty_applied):
-    total_area_xp = 0
-    for task, mins in minutes_by_task.items():
-        base_rate = BASE_XP.get(task, 0.0)
-        bt = buff_time(mins)
-        bd = buff_day(streak_days)
-        extra = bt + bd + (BUFF_FOOD if food_ok else 0) + (BUFF_SLEEP if sleep_ok else 0)
-        extra = min(extra, MAX_EXTRA_BUFF)
-        debuff = min(0.10 * days_missed, 1.0)
-        multiplier = max(0.0, 1.0 + extra - debuff)
-        xp = int(round(base_rate * mins * multiplier))
-        total_area_xp += xp
-    return total_area_xp
+def buff_task(task, minutes):
+    """Devuelve el buffo generado por una tarea concreta según sus minutos."""
+    if task in ["estudiar", "entrenar", "organizar"]:
+        return 0.1 * (1 - math.exp(-minutes / 80))
+    elif task in ["lectura", "andar"]:
+        return 0.1 * (1 - math.exp(-minutes / 800))
+    elif task == "meditar":
+        return 0.1 * (1 - math.exp(-minutes / 20))
+    else:
+        return 0
 
-def process_day(state, day_payload):
-    date = day_payload['date']
-    sessions = day_payload['sessions']
-    food_ok = day_payload.get('food_ok', False)
-    sleep_ok = day_payload.get('sleep_ok', False)
+def required_met(area, tasks):
+    """Comprueba si se cumplen los mínimos diarios de un área."""
+    req = MIN_REQ.get(area, {})
+    for t, min_req in req.items():
+        if tasks.get(t, 0) < min_req:
+            return False
+    return True
 
-    minutes_by_area_task = {}
+def level_xp_required(level):
+    """Devuelve la XP necesaria para pasar de un nivel al siguiente."""
+    return int(round(50 * (1.01 ** (level - 1))))
+
+# =====================
+# LÓGICA PRINCIPAL
+# =====================
+
+def compute_day(state, payload):
+    date = payload["date"]
+    sessions = payload["sessions"]
+    food_ok = payload.get("food_ok", False)
+    sleep_ok = payload.get("sleep_ok", False)
+
+    # --- Agrupar minutos por área ---
+    minutes_by_area = {a: {} for a in AREA_TASKS}
     for s in sessions:
-        key = (s['area'], s['task'])
-        minutes_by_area_task.setdefault(key, 0)
-        minutes_by_area_task[key] += s['minutes']
+        area, task, mins = s["area"], s["task"], s["minutes"]
+        minutes_by_area.setdefault(area, {})
+        minutes_by_area[area][task] = minutes_by_area[area].get(task, 0) + mins
 
-    per_area = {}
-    for (area, task), mins in minutes_by_area_task.items():
-        per_area.setdefault(area, {})[task] = mins
+    # --- Bufo global para este día ---
+    global_buff = 0.0
+    if food_ok: global_buff += GLOBAL_BUFF_FOOD
+    if sleep_ok: global_buff += GLOBAL_BUFF_SLEEP
 
-    for area, tasks in per_area.items():
-        area_state = state['areas'].setdefault(area, {"xp": 0, "streak": 0, "days_missed": 0, "recovery_streak": 0, "penalty_applied": False})
-        streak_days = area_state['streak']
-        days_missed = area_state['days_missed']
-        penalty_applied = area_state['penalty_applied']
+    # --- Procesar cada área ---
+    for area, tasks in minutes_by_area.items():
+        area_state = state["areas"].setdefault(area, {
+            "xp": 0,
+            "level": 1,
+            "rate": BASE_RATE
+        })
 
-        xp_gained = compute_day_xp(area_state, tasks, streak_days, days_missed, food_ok, sleep_ok, penalty_applied)
+        # Calcular buffos específicos del área
+        buff_area = 0
+        for t, mins in tasks.items():
+            buff_area += buff_task(t, mins)
 
-        if area_state['days_missed'] >= 10 and not penalty_applied:
-            area_state['xp'] = max(0, area_state['xp'] - PENALTY_XP)
-            area_state['penalty_applied'] = True
-            penalty_applied = True
+        # Aplicar buffo: sube la tasa del área
+        area_state["rate"] = min(area_state["rate"] + buff_area, MAX_RATE)
 
-        if sum(tasks.values()) > 0:
-            area_state['xp'] += xp_gained
-            area_state['days_missed'] = 0
-            area_state['recovery_streak'] = min(area_state['recovery_streak'] + 1, RECOVERY_DAYS)
-            area_state['streak'] += 1
-            if area_state['recovery_streak'] >= RECOVERY_DAYS:
-                area_state['penalty_applied'] = False
-                area_state['recovery_streak'] = 0
-        else:
-            area_state['days_missed'] += 1
-            area_state['streak'] = 0
-            area_state['recovery_streak'] = 0
+        # Comprobar si se cumplieron los mínimos
+        if not required_met(area, tasks):
+            if area_state["rate"] > BASE_RATE:
+                area_state["rate"] = BASE_RATE
+            else:
+                area_state["rate"] = max(MIN_RATE, area_state["rate"] - RATE_DROP)
+                if area_state["rate"] == 0:
+                    area_state["xp"] = max(0, area_state["xp"] - XP_PENALTY)
 
+        # Calcular XP ganada
+        xp_gained = 0
+        for t, mins in tasks.items():
+            base_rate = BASE_XP.get(t, 0)
+            xp_gained += base_rate * mins * area_state["rate"]
+
+        # Aplicar bufo global diario
+        xp_gained *= (1 + global_buff)
+        xp_gained = int(round(xp_gained))
+
+        area_state["xp"] += xp_gained
+
+        # Subida de nivel
+        while area_state["xp"] >= level_xp_required(area_state["level"]):
+            area_state["xp"] -= level_xp_required(area_state["level"])
+            area_state["level"] += 1
+
+    state["last_date"] = date
     return state
+
+# =====================
+# FUNCIONES AUXILIARES
+# =====================
+
+def load_state(path):
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"areas": {}}
+
+def save_state(state, path):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(state, f, indent=2, ensure_ascii=False)

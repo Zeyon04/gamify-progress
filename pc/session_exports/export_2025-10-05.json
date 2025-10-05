@@ -1,0 +1,26 @@
+{
+  "user": "oscar",
+  "date": "2025-10-05",
+  "sessions": [
+    {
+      "date": "2025-10-05",
+      "area": "ejercicio",
+      "task": "entrenar",
+      "minutes": 2
+    },
+    {
+      "date": "2025-10-05",
+      "area": "ejercicio",
+      "task": "andar",
+      "minutes": 1
+    },
+    {
+      "date": "2025-10-05",
+      "area": "inteligencia",
+      "task": "estudiar",
+      "minutes": 7
+    }
+  ],
+  "food_ok": true,
+  "sleep_ok": true
+}

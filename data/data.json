@@ -1,4 +1,28 @@
 {
-  "areas": {}
+  "areas": {
+    "inteligencia": {
+      "xp": 0,
+      "xp_rate": 1.0,
+      "streak": 0,
+      "days_missed": 0,
+      "recovery_streak": 0,
+      "penalty_applied": false
+    },
+    "ejercicio": {
+      "xp": 0,
+      "xp_rate": 1.0,
+      "streak": 0,
+      "days_missed": 0,
+      "recovery_streak": 0,
+      "penalty_applied": false
+    },
+    "salud_mental": {
+      "xp": 0,
+      "xp_rate": 1.0,
+      "streak": 0,
+      "days_missed": 0,
+      "recovery_streak": 0,
+      "penalty_applied": false
+    }
+  }
 }
-

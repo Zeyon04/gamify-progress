@@ -5,10 +5,10 @@ function start(task, area) {
   if (timer) return;
   currentTask = { area, task };
   startTs = Date.now();
-  document.getElementById('status').innerText = `Grabando: ${task} (${area})...`;
+  updateStatus(`Grabando: ${task} (${area})...`);
   timer = setInterval(() => {
     const mins = Math.floor((Date.now() - startTs) / 60000);
-    document.getElementById('status').innerText = `Grabando: ${task} (${mins} min)`;
+    updateStatus(`Grabando: ${task} (${mins} min)`);
   }, 1000);
 }
 
@@ -20,18 +20,24 @@ function stop() {
   const date = new Date().toISOString().slice(0, 10);
   sessions.push({ date, area: currentTask.area, task: currentTask.task, minutes: mins });
   localStorage.setItem('sessions', JSON.stringify(sessions));
-  document.getElementById('status').innerText = `Guardado ${mins} min de ${currentTask.task}`;
+  updateStatus(`Guardado ${mins} min de ${currentTask.task}`);
   currentTask = null;
 }
 
-function exportToday(food_ok, sleep_ok) {
+function exportToday() {
   const today = new Date().toISOString().slice(0, 10);
   const todays = sessions.filter(s => s.date === today);
+  const food_ok = document.getElementById("food").checked;
+  const sleep_ok = document.getElementById("sleep").checked;
   const payload = { user: "oscar", date: today, sessions: todays, food_ok, sleep_ok };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `export_${today}.json`;
   a.click();
-  document.getElementById('status').innerText = "Archivo exportado ✅";
+  updateStatus("Archivo exportado ✅");
+}
+
+function updateStatus(text) {
+  document.getElementById("status").innerText = text;
 }
