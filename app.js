@@ -120,7 +120,8 @@ function exportToday() {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `export_${today}_${timestamp.replace(/:/g,"")}.json`; // archivo único por hora
+  // Nombre del archivo con hora, minuto y segundo usando guiones
+  a.download = `export_${today}-${timestamp.replace(/:/g,"-")}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
