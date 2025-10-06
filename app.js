@@ -96,7 +96,9 @@ function stopSleep() {
 document.getElementById("exportBtn").addEventListener("click", exportToday);
 
 function exportToday() {
-  const today = new Date().toISOString().slice(0,10);
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const timestamp = now.toISOString().slice(11,19); // hh:mm:ss
   const todays = [];
 
   sessions.forEach(s => {
@@ -113,28 +115,46 @@ function exportToday() {
   const sleep_ok = todays.some(t => t.task === "dormir" && t.minutes >= 480);
   const dinner_ok = document.getElementById("dinner").checked;
 
-  const payload = { user: "oscar", date: today, sessions: todays, food_ok, dinner_ok, sleep_ok };
+  // Añadimos hora al JSON
+  const payload = { user: "oscar", date: today, time: timestamp, sessions: todays, food_ok, dinner_ok, sleep_ok };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `export_${today}.json`;
+  a.download = `export_${today}_${timestamp.replace(/:/g,"")}.json`; // archivo único por hora
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(a.href);
 
-  // Generar mensaje de resumen
-  let summary = "✅ Exportado:\n";
-  todays.forEach(s => {
-    summary += `${s.task}: ${s.minutes} min\n`;
-  });
-  if (food_ok) summary += "Comida OK ✅\n";
-  if (dinner_ok) summary += "Cena OK ✅\n";
-  if (sleep_ok) summary += "Sueño OK ✅\n";
+  // Crear popup bonito
+  const popup = document.createElement("div");
+  popup.style.position = "fixed";
+  popup.style.top = "50%";
+  popup.style.left = "50%";
+  popup.style.transform = "translate(-50%, -50%)";
+  popup.style.background = "#4fc3f7";
+  popup.style.color = "#fff";
+  popup.style.padding = "1.5rem 2rem";
+  popup.style.borderRadius = "12px";
+  popup.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+  popup.style.zIndex = "1000";
+  popup.style.textAlign = "center";
+  popup.style.fontSize = "1.2rem";
+  popup.innerHTML = `🎉 Felicidades, progreso actualizado!\n<br><br>` +
+                    todays.map(s => `${s.task}: ${s.minutes} min`).join("<br>") +
+                    (food_ok ? "<br>Comida OK ✅" : "") +
+                    (dinner_ok ? "<br>Cena OK ✅" : "") +
+                    (sleep_ok ? "<br>Sueño OK ✅" : "");
 
-  alert(summary);
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.remove();
+  }, 3500);
+
   updateStatus("Archivo exportado ✅");
 }
+
 
 
 // --- Helpers ---
