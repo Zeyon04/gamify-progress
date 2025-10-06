@@ -3,7 +3,7 @@ import os
 import glob
 import json
 import matplotlib.pyplot as plt
-from core import process_day
+from core import compute_day
 
 # Rutas
 DATA_PATH = "../data/data.json"
@@ -31,7 +31,7 @@ else:
     for jf in sorted(json_files):
         with open(jf, "r") as f:
             payload = json.load(f)
-        state = process_day(state, payload)
+        state = compute_day(state, payload)
         print(f"✅ Procesado: {os.path.basename(jf)}")
 
 # 3️⃣ Guardar estado actualizado
