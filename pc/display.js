@@ -1,67 +1,121 @@
-// Leer data.json
-fetch('../data/data.json')
-  .then(res => res.json())
-  .then(data => {
-    updateDisplay(data);
-  });
+// display.js
 
-function updateDisplay(data) {
+// --- Configuración ---
+const DATA_PATH = "../data/data.json";  // ruta relativa a pc/
+
+let dailyMode = true;  // modo inicial: diario
+let dataState = null;
+
+// --- Funciones de carga ---
+async function loadData() {
+  try {
+    const response = await fetch(DATA_PATH);
+    dataState = await response.json();
+    updateDisplay();
+  } catch (err) {
+    console.error("Error cargando data.json:", err);
+  }
+}
+
+// --- Helpers ---
+function createBar(container, label, value, max=100) {
+  const barContainer = document.createElement("div");
+  barContainer.className = "bar-container";
+
+  const barLabel = document.createElement("div");
+  barLabel.className = "bar-label";
+  barLabel.textContent = label;
+
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  bar.style.width = `${Math.min(value / max * 100, 100)}%`;
+
+  barContainer.appendChild(barLabel);
+  barContainer.appendChild(bar);
+  container.appendChild(barContainer);
+}
+
+// --- Update display ---
+function updateDisplay() {
+  const titleEl = document.getElementById("display-title");
+  titleEl.textContent = "OSCAR";
+
   // Minutos acumulados hoy
-  const today = new Date().toISOString().slice(0,10);
-  let minutesToday = 0;
-  for (let area in data.areas) {
-    const sessions = data.areas[area].sessions[today] || {};
-    for (let task in sessions) {
-      minutesToday += sessions[task];
+  const today = new Date().toISOString().split("T")[0];
+  let todayMinutes = 0;
+  for (const area in dataState.areas) {
+    const dayTasks = dataState.areas[area].sessions[today] || {};
+    for (const task in dayTasks) {
+      todayMinutes += dayTasks[task];
     }
   }
-  document.getElementById('minutesToday').innerText = minutesToday;
+  document.getElementById("today-minutes").textContent = todayMinutes + " min";
 
-  // Barras de progreso
-  const areas = ['inteligencia', 'ejercicio', 'salud_mental'];
-  areas.forEach(area => {
-    const xp = data.areas[area].xp;
-    const level = data.areas[area].level;
-    const percent = Math.min(100, Math.round(xp / level_xp_required(level) * 100));
-    document.getElementById('bar' + capitalize(area)).style.width = percent + '%';
-  });
+  // Barras de experiencia por área
+  const expContainer = document.getElementById("exp-bars");
+  expContainer.innerHTML = "";
+  for (const area in dataState.areas) {
+    const areaData = dataState.areas[area];
+    createBar(expContainer, area, areaData.xp, 100);
+  }
 
-  // Gráfico de barras diario
+  // Gráfico de experiencia diario/mensual
+  drawExpChart();
+}
+
+// --- Gráfico ---
+function drawExpChart() {
+  const canvas = document.getElementById("exp-chart");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Preparar datos
+  const days = dailyMode ? 7 : 4;  // últimas 7 días o 4 meses aprox.
   const labels = [];
-  const values = [];
-  for (let day in data.areas.ejercicio.sessions) {
-    labels.push(day);
-    let dayTotal = 0;
-    for (let task in data.areas.ejercicio.sessions[day]) {
-      dayTotal += data.areas.ejercicio.sessions[day][task];
-    }
-    values.push(dayTotal);
-  }
+  const totals = [];
 
-  const ctx = document.getElementById('xpChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Minutos por día',
-        data: values,
-        backgroundColor: 'rgba(160,82,45,0.7)',
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true } }
-    }
+  const areaNames = Object.keys(dataState.areas);
+  const allDates = Object.values(dataState.areas[areaNames[0]].sessions).length > 0 ?
+                   Object.keys(dataState.areas[areaNames[0]].sessions) : [];
+
+  // Recogemos últimos días
+  let lastDates = allDates.slice(-days);
+
+  lastDates.forEach(date => {
+    labels.push(date);
+    let totalXP = 0;
+    areaNames.forEach(area => {
+      const dayTasks = dataState.areas[area].sessions[date] || {};
+      for (const t in dayTasks) {
+        totalXP += dayTasks[t];
+      }
+    });
+    totals.push(totalXP);
+  });
+
+  // Dibujar barras
+  const barWidth = canvas.width / totals.length * 0.6;
+  const maxXP = Math.max(...totals, 1);
+
+  totals.forEach((val, i) => {
+    const x = i * (canvas.width / totals.length) + (canvas.width / totals.length - barWidth)/2;
+    const y = canvas.height - (val / maxXP * canvas.height);
+    const height = canvas.height - y;
+    ctx.fillStyle = "#FFD700"; // dorado para barras
+    ctx.fillRect(x, y, barWidth, height);
+
+    // Texto
+    ctx.fillStyle = "#FFF";
+    ctx.font = "12px 'Comic Sans MS', cursive, sans-serif";
+    ctx.fillText(val, x + barWidth/4, y - 5);
   });
 }
 
-// Funciones auxiliares
-function level_xp_required(level) {
-  return Math.round(50 * Math.pow(1.01, level-1));
-}
+// --- Toggle diario/mensual ---
+document.getElementById("toggle-chart").addEventListener("click", () => {
+  dailyMode = !dailyMode;
+  drawExpChart();
+});
 
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+// --- Inicialización ---
+window.onload = loadData;

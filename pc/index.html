@@ -1,41 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Gamify Progress - Display</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progreso OSCAR</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="header">OSCAR</div>
-
   <div class="container">
     <div class="menu">
       <div class="daily-minutes">
-        <h3>Minutos acumulados hoy</h3>
+        <div>Minutos hoy</div>
         <div id="minutesToday">0</div>
       </div>
-    </div>
-
-    <div class="bars">
-      <h3>Progreso por área</h3>
-      <div class="bar-container">
-        <div class="bar-label">Inteligencia</div>
-        <div class="bar-bg"><div class="bar-fill" id="barInteligencia"></div></div>
-
+      <div class="bars">
         <div class="bar-label">Ejercicio</div>
-        <div class="bar-bg"><div class="bar-fill" id="barEjercicio"></div></div>
+        <div class="bar-bg"><div id="barEjercicio" class="bar-fill"></div></div>
+
+        <div class="bar-label">Inteligencia</div>
+        <div class="bar-bg"><div id="barInteligencia" class="bar-fill"></div></div>
 
         <div class="bar-label">Salud Mental</div>
-        <div class="bar-bg"><div class="bar-fill" id="barSaludMental"></div></div>
+        <div class="bar-bg"><div id="barSalud" class="bar-fill"></div></div>
       </div>
     </div>
 
     <div class="chart-container">
+      <select id="chartView">
+        <option value="daily">Diario</option>
+        <option value="monthly">Mensual</option>
+      </select>
       <canvas id="xpChart"></canvas>
     </div>
   </div>
-
-  <script src="display.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
