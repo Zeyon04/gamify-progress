@@ -133,7 +133,7 @@ function exportToday() {
   popup.style.top = "50%";
   popup.style.left = "50%";
   popup.style.transform = "translate(-50%, -50%)";
-  popup.style.background = "#4fc3f7";
+  popup.style.background = "#77f777ff";
   popup.style.color = "#fff";
   popup.style.padding = "1.5rem 2rem";
   popup.style.borderRadius = "12px";
