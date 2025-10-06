@@ -1,8 +1,23 @@
 {
   "areas": {
-    "inteligencia": { "xp": 0, "level": 1, "rate": 1.0, "sessions": {} },
-    "ejercicio":    { "xp": 0, "level": 1, "rate": 1.0, "sessions": {} },
-    "salud_mental": { "xp": 0, "level": 1, "rate": 1.0, "sessions": {} }
+    "inteligencia": {
+      "xp": 0,
+      "level": 1,
+      "rate": 1.0,
+      "sessions": {}
+    },
+    "ejercicio": {
+      "xp": 0,
+      "level": 1,
+      "rate": 1.0,
+      "sessions": {}
+    },
+    "salud_mental": {
+      "xp": 0,
+      "level": 1,
+      "rate": 1.0,
+      "sessions": {}
+    }
   },
   "last_processed_date": "2025-10-05",
   "food_log": {},

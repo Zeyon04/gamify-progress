@@ -103,13 +103,12 @@ def compute_day(state, payload):
 
     # --- Revisar si hay un día anterior que procesar ---
     last_date = state.get("last_processed_date")
-    if last_date is not None and date > last_date:
-        # Procesar XP y buffs/debuffs del día anterior
-        process_day_for_date(state, last_date)
-        # Actualizar la fecha procesada
+    if last_date is None:
+        # primera vez que se ejecuta el programa
         state["last_processed_date"] = date
-    elif last_date is None:
-        # Si es la primera ejecución, inicializa la fecha
+    elif date > last_date:
+        # procesar el día anterior y luego actualizar
+        process_day_for_date(state, last_date)
         state["last_processed_date"] = date
 
     # No se procesa XP todavía para el día actual, solo se acumulan minutos
