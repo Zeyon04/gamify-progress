@@ -136,9 +136,13 @@ def process_day_for_date(state, date):
         area_state.setdefault("level", 1)
         area_state.setdefault("rate", BASE_RATE)
 
-        # Buff específico por tareas
-        buff_area = sum(buff_task(t, mins) for t, mins in tasks.items())
-        area_state["rate"] = min(area_state["rate"] + buff_area, MAX_RATE)
+        # Buff específico solo si se cumplen los mínimos diarios
+        if required_met(area, tasks):
+            buff_area = sum(buff_task(t, mins) for t, mins in tasks.items())
+            area_state["rate"] = min(area_state["rate"] + buff_area, MAX_RATE)
+        else:
+            # No se suma buff, solo se aplica debuff más abajo
+            pass
 
         # Comprobar mínimos diarios
         if not required_met(area, tasks):
