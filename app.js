@@ -117,7 +117,7 @@ function exportToday() {
   const sleep_ok = todays.some(t => t.task === "dormir" && t.minutes >= 480);
   const dinner_ok = document.getElementById("dinner").checked;
 
-  const payload = { user: "oscar", date: today, time: localTime, sessions: todays, food_ok, dinner_ok, sleep_ok };
+  const payload = { user: "oscar", date: today, time: localTime, sessions: todays, food_ok, dinner_ok, sleep_ok, processed: false };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
