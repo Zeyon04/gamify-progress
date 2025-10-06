@@ -2,50 +2,40 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard Progreso</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamify Progress - Display</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header>
-    <h1>OSCAR</h1>
-  </header>
+  <div class="header">OSCAR</div>
 
   <div class="container">
-    <aside>
-      <h2>Minutos del día</h2>
-      <div id="todayMinutes">0</div>
-    </aside>
+    <div class="menu">
+      <div class="daily-minutes">
+        <h3>Minutos acumulados hoy</h3>
+        <div id="minutesToday">0</div>
+      </div>
+    </div>
 
-    <main>
-      <section id="xpBars">
-        <h2>Progreso por área</h2>
-        <div class="bar-container">
-          <div>Inteligencia <span id="xpInt">0 XP</span></div>
-          <div class="bar" id="barInt"></div>
-        </div>
-        <div class="bar-container">
-          <div>Ejercicio <span id="xpEj">0 XP</span></div>
-          <div class="bar" id="barEj"></div>
-        </div>
-        <div class="bar-container">
-          <div>Salud Mental <span id="xpSalud">0 XP</span></div>
-          <div class="bar" id="barSalud"></div>
-        </div>
-      </section>
+    <div class="bars">
+      <h3>Progreso por área</h3>
+      <div class="bar-container">
+        <div class="bar-label">Inteligencia</div>
+        <div class="bar-bg"><div class="bar-fill" id="barInteligencia"></div></div>
 
-      <section id="historyChart">
-        <h2>Histórico de XP</h2>
-        <canvas id="xpCanvas"></canvas>
-        <div class="controls">
-          <button onclick="setView('day')">Día</button>
-          <button onclick="setView('month')">Mes</button>
-        </div>
-      </section>
-    </main>
+        <div class="bar-label">Ejercicio</div>
+        <div class="bar-bg"><div class="bar-fill" id="barEjercicio"></div></div>
+
+        <div class="bar-label">Salud Mental</div>
+        <div class="bar-bg"><div class="bar-fill" id="barSaludMental"></div></div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <canvas id="xpChart"></canvas>
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js"></script>
+  <script src="display.js"></script>
 </body>
 </html>

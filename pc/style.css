@@ -1,80 +1,65 @@
 body {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: 'Patrick Hand', cursive; /* escritura a mano */
+  background-color: #fdf6e3; /* crema */
+  color: #000;
   margin: 0;
-  background: #111;
-  color: #fff;
+  padding: 1rem;
 }
 
-header {
+.header {
   text-align: center;
-  padding: 1rem;
-  background: linear-gradient(to right, #ff0000, #00ff00, #0000ff);
-  color: #fff;
   font-size: 2rem;
-  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 .container {
   display: flex;
-  height: calc(100vh - 80px);
+  justify-content: space-between;
+  gap: 2rem;
 }
 
-aside {
-  width: 200px;
-  background: #222;
+.menu {
+  width: 20%;
+}
+
+.daily-minutes {
+  background-color: #f5deb3; /* beige */
   padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 1.5rem;
 }
 
-aside h2 {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-}
-
-#todayMinutes {
-  font-size: 2rem;
-  color: #0ff;
-}
-
-main {
-  flex: 1;
-  padding: 1rem;
-  overflow-y: auto;
+.bars {
+  width: 35%;
 }
 
 .bar-container {
-  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.bar {
-  height: 25px;
-  background: linear-gradient(to right, #ff0000, #00ff00, #0000ff);
-  border-radius: 5px;
-  width: 0;
-  transition: width 1s ease;
+.bar-label {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
 }
 
-canvas {
-  background: #111;
-  border: 1px solid #555;
-  margin-top: 1rem;
+.bar-bg {
+  background-color: #eee;
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.controls {
-  margin-top: 0.5rem;
+.bar-fill {
+  background-color: #a0522d; /* marrón */
+  height: 100%;
+  width: 0%;
+  border-radius: 10px 0 0 10px;
+  transition: width 0.5s;
 }
 
-.controls button {
-  margin-right: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: #0ff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  color: #000;
-}
-
-.controls button:hover {
-  background: #0aa;
-  color: #fff;
+.chart-container {
+  width: 40%;
 }
