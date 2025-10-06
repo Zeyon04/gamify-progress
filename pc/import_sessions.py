@@ -3,7 +3,7 @@ import os
 from core import compute_day
 
 DATA_PATH = "../data/data.json"
-EXPORTS_PATH = "../session_exports"  # carpeta donde metes los .json del móvil
+EXPORTS_PATH = "./session_exports"  # carpeta donde metes los .json del móvil
 
 def load_state():
     try:
