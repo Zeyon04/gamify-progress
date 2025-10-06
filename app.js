@@ -118,9 +118,24 @@ function exportToday() {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `export_${today}.json`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+
+  // Generar mensaje de resumen
+  let summary = "✅ Exportado:\n";
+  todays.forEach(s => {
+    summary += `${s.task}: ${s.minutes} min\n`;
+  });
+  if (food_ok) summary += "Comida OK ✅\n";
+  if (dinner_ok) summary += "Cena OK ✅\n";
+  if (sleep_ok) summary += "Sueño OK ✅\n";
+
+  alert(summary);
   updateStatus("Archivo exportado ✅");
 }
+
 
 // --- Helpers ---
 function updateStatus(text) {
