@@ -1,0 +1,80 @@
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  margin: 0;
+  background: #111;
+  color: #fff;
+}
+
+header {
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(to right, #ff0000, #00ff00, #0000ff);
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.container {
+  display: flex;
+  height: calc(100vh - 80px);
+}
+
+aside {
+  width: 200px;
+  background: #222;
+  padding: 1rem;
+}
+
+aside h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+#todayMinutes {
+  font-size: 2rem;
+  color: #0ff;
+}
+
+main {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.bar-container {
+  margin: 1rem 0;
+}
+
+.bar {
+  height: 25px;
+  background: linear-gradient(to right, #ff0000, #00ff00, #0000ff);
+  border-radius: 5px;
+  width: 0;
+  transition: width 1s ease;
+}
+
+canvas {
+  background: #111;
+  border: 1px solid #555;
+  margin-top: 1rem;
+}
+
+.controls {
+  margin-top: 0.5rem;
+}
+
+.controls button {
+  margin-right: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #0ff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #000;
+}
+
+.controls button:hover {
+  background: #0aa;
+  color: #fff;
+}
