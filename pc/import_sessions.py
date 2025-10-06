@@ -17,12 +17,12 @@ def save_state(state):
         json.dump(state, f, indent=2)
 
 def import_file(file_path):
-    """Procesa un único JSON exportado desde el móvil y acumula minutos del mismo día."""
+    """Procesa un único JSON exportado desde el móvil."""
     state = load_state()
     with open(file_path, "r", encoding="utf-8") as f:
         payload = json.load(f)
 
-    # Compatibilidad: si no existen los campos nuevos, los añadimos por defecto
+    # Compatibilidad campos nuevos
     payload.setdefault("food_ok", False)
     payload.setdefault("sleep_ok", False)
 

@@ -68,15 +68,15 @@ def level_xp_required(level):
 
 def compute_day(state, payload):
     """
-    Procesa un JSON de sesión, acumulando minutos y calculando XP y buffs
-    solo al final del día (si aún no se ha procesado ese día).
+    Acumula minutos del día actual. 
+    Solo procesa XP y buffs del día anterior cuando llega un nuevo día.
     """
     date = payload["date"]
     sessions = payload.get("sessions", [])
     food_ok = payload.get("food_ok", False)
     sleep_ok = payload.get("sleep_ok", False)
 
-    # --- Acumular minutos en el registro diario ---
+    # --- Acumular minutos en sessions ---
     for s in sessions:
         area = s["area"]
         task = s["task"]
@@ -87,38 +87,40 @@ def compute_day(state, payload):
         area_state["sessions"].setdefault(date, {})
         area_state["sessions"][date][task] = area_state["sessions"][date].get(task, 0) + mins
 
-    # --- Determinar si se debe procesar XP de este día ---
+    # --- Revisar si hay un día anterior que procesar ---
     last_date = state.get("last_processed_date")
-    if last_date is not None and date <= last_date:
-        # Ya se procesó XP de este día, solo acumulamos minutos
-        return state
+    if last_date is not None and date > last_date:
+        # Procesar XP y buffs del día anterior
+        process_day_for_date(state, last_date)
 
-    # --- Procesar XP y buffs solo una vez por día ---
-    minutes_by_area = {a: {} for a in AREA_TASKS}
-    for area, area_state in state["areas"].items():
-        tasks_today = area_state.get("sessions", {}).get(date, {})
-        for t, mins in tasks_today.items():
-            minutes_by_area[area][t] = mins
+    # No se procesa XP todavía para el día actual, solo se acumulan minutos
+    return state
 
-    # Buff global diario
+
+def process_day_for_date(state, date):
+    """
+    Procesa XP y buffs/debuffs para un día específico.
+    """
+    # Buffs diarios globales
+    food_ok = True if date in state.get("food_log", {}) else False
+    sleep_ok = True if date in state.get("sleep_log", {}) else False
     global_buff = 0.0
-    if food_ok:
-        global_buff += GLOBAL_BUFF_FOOD
-    if sleep_ok:
-        global_buff += GLOBAL_BUFF_SLEEP
+    if food_ok: global_buff += GLOBAL_BUFF_FOOD
+    if sleep_ok: global_buff += GLOBAL_BUFF_SLEEP
 
-    # --- Procesar cada área ---
-    for area, tasks in minutes_by_area.items():
-        area_state = state["areas"].setdefault(area, {
-            "xp": 0,
-            "level": 1,
-            "rate": BASE_RATE
-        })
+    for area, area_state in state["areas"].items():
+        tasks = area_state.get("sessions", {}).get(date, {})
 
+        # Inicializar si no existe
+        area_state.setdefault("xp", 0)
+        area_state.setdefault("level", 1)
+        area_state.setdefault("rate", BASE_RATE)
+
+        # Buff específico por tareas
         buff_area = sum(buff_task(t, mins) for t, mins in tasks.items())
-        area_state["rate"] = min(area_state.get("rate", BASE_RATE) + buff_area, MAX_RATE)
+        area_state["rate"] = min(area_state["rate"] + buff_area, MAX_RATE)
 
-        # Verificar mínimos diarios
+        # Comprobar mínimos diarios
         if not required_met(area, tasks):
             if area_state["rate"] > BASE_RATE:
                 area_state["rate"] = BASE_RATE
@@ -127,20 +129,20 @@ def compute_day(state, payload):
                 if area_state["rate"] == 0:
                     area_state["xp"] = max(0, area_state["xp"] - XP_PENALTY)
 
-        # Calcular XP ganada
+        # XP ganada
         xp_gained = sum(BASE_XP.get(t,0) * mins * area_state["rate"] for t, mins in tasks.items())
         xp_gained *= (1 + global_buff)
         xp_gained = int(round(xp_gained))
         area_state["xp"] += xp_gained
 
         # Subida de nivel
-        while area_state["xp"] >= level_xp_required(area_state.get("level", 1)):
-            area_state["xp"] -= level_xp_required(area_state.get("level", 1))
-            area_state["level"] = area_state.get("level", 1) + 1
+        while area_state["xp"] >= level_xp_required(area_state["level"]):
+            area_state["xp"] -= level_xp_required(area_state["level"])
+            area_state["level"] += 1
 
     # Actualizar fecha procesada
     state["last_processed_date"] = date
-    return state
+
 
 # =====================
 # FUNCIONES AUXILIARES
