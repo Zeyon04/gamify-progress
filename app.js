@@ -98,9 +98,11 @@ document.getElementById("exportBtn").addEventListener("click", exportToday);
 function exportToday() {
   const now = new Date();
   const today = now.toISOString().slice(0,10);
-  const timestamp = now.toISOString().slice(11,19); // hh:mm:ss
-  const todays = [];
 
+  // Hora local
+  const localTime = now.toLocaleTimeString('es-ES', { hour12: false }); // "HH:MM:SS"
+
+  const todays = [];
   sessions.forEach(s => {
     if (s.date === today) {
       let existing = todays.find(t => t.task === s.task);
@@ -115,26 +117,24 @@ function exportToday() {
   const sleep_ok = todays.some(t => t.task === "dormir" && t.minutes >= 480);
   const dinner_ok = document.getElementById("dinner").checked;
 
-  // Añadimos hora al JSON
-  const payload = { user: "oscar", date: today, time: timestamp, sessions: todays, food_ok, dinner_ok, sleep_ok };
+  const payload = { user: "oscar", date: today, time: localTime, sessions: todays, food_ok, dinner_ok, sleep_ok };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  // Nombre del archivo con hora, minuto y segundo usando guiones
-  a.download = `export_${today}-${timestamp.replace(/:/g,"-")}.json`;
+  a.download = `export_${today}-${localTime.replace(/:/g,"-")}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(a.href);
 
-  // Crear popup bonito
+  // Popup amarillo
   const popup = document.createElement("div");
   popup.style.position = "fixed";
   popup.style.top = "50%";
   popup.style.left = "50%";
   popup.style.transform = "translate(-50%, -50%)";
-  popup.style.background = "#77f777ff";
-  popup.style.color = "#fff";
+  popup.style.background = "#FFD700";  // amarillo
+  popup.style.color = "#000";          // texto negro
   popup.style.padding = "1.5rem 2rem";
   popup.style.borderRadius = "12px";
   popup.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
@@ -155,8 +155,6 @@ function exportToday() {
 
   updateStatus("Archivo exportado ✅");
 }
-
-
 
 // --- Helpers ---
 function updateStatus(text) {
