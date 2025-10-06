@@ -85,7 +85,13 @@ def compute_day(state, payload):
         area_state = state["areas"].setdefault(area, {})
         area_state.setdefault("sessions", {})
         area_state["sessions"].setdefault(date, {})
-        area_state["sessions"][date][task] = area_state["sessions"][date].get(task, 0) + mins
+
+        # Evitar duplicar minutos si ya se importó el mismo archivo
+        if task not in area_state["sessions"][date]:
+            area_state["sessions"][date][task] = mins
+        else:
+            # Solo sumar si el nuevo valor es distinto (por ejemplo otro JSON del mismo día)
+            area_state["sessions"][date][task] += mins
 
     # --- Guardar logs de buffs diarios (food/sleep) ---
     state.setdefault("food_log", {})
@@ -100,6 +106,11 @@ def compute_day(state, payload):
     if last_date is not None and date > last_date:
         # Procesar XP y buffs/debuffs del día anterior
         process_day_for_date(state, last_date)
+        # Actualizar la fecha procesada
+        state["last_processed_date"] = date
+    elif last_date is None:
+        # Si es la primera ejecución, inicializa la fecha
+        state["last_processed_date"] = date
 
     # No se procesa XP todavía para el día actual, solo se acumulan minutos
     return state
@@ -113,8 +124,10 @@ def process_day_for_date(state, date):
     food_ok = state.get("food_log", {}).get(date, False)
     sleep_ok = state.get("sleep_log", {}).get(date, False)
     global_buff = 0.0
-    if food_ok: global_buff += GLOBAL_BUFF_FOOD
-    if sleep_ok: global_buff += GLOBAL_BUFF_SLEEP
+    if food_ok:
+        global_buff += GLOBAL_BUFF_FOOD
+    if sleep_ok:
+        global_buff += GLOBAL_BUFF_SLEEP
 
     for area, area_state in state["areas"].items():
         tasks = area_state.get("sessions", {}).get(date, {})
@@ -148,8 +161,8 @@ def process_day_for_date(state, date):
             area_state["xp"] -= level_xp_required(area_state["level"])
             area_state["level"] += 1
 
-    # Actualizar fecha procesada al día anterior
-    state["last_processed_date"] = date
+    # No tocar last_processed_date aquí (lo hace compute_day)
+    return state
 
 # =====================
 # FUNCIONES AUXILIARES
