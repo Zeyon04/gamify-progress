@@ -40,8 +40,8 @@ function stopTask() {
   const elapsed = Date.now() - taskStart;
   const mins = Math.max(1, Math.round(elapsed / 60000));
   const now = new Date();
-  const today = now.toISOString().slice(0,10);
-  const timestamp = now.toISOString().slice(11,19);
+  const today = now.toLocaleDateString('sv-SE'); // YYYY-MM-DD local
+  const timestamp = now.toLocaleTimeString('es-ES', { hour12: false }); // HH:MM:SS local
 
   let existing = sessions.find(s => s.date === today && s.task === currentTask.task);
   if (!existing || mins > existing.minutes) {
@@ -80,8 +80,8 @@ function stopSleep() {
   sleepBtn.querySelector(".timer").innerText = "00:00:00";
 
   const now = new Date();
-  const today = now.toISOString().slice(0,10);
-  const timestamp = now.toISOString().slice(11,19);
+  const today = now.toLocaleDateString('sv-SE');
+  const timestamp = now.toLocaleTimeString('es-ES', { hour12: false });
   let existing = sessions.find(s => s.date === today && s.task === "dormir");
   if (!existing || mins > existing.minutes) {
     if (existing) existing.minutes = mins;
@@ -97,7 +97,7 @@ document.getElementById("exportBtn").addEventListener("click", exportToday);
 
 function exportToday() {
   const now = new Date();
-  const today = now.toISOString().slice(0,10);
+  const today = now.toLocaleDateString('sv-SE');
 
   // Hora local
   const localTime = now.toLocaleTimeString('es-ES', { hour12: false }); // "HH:MM:SS"
