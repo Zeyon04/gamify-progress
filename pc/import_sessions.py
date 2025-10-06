@@ -17,7 +17,7 @@ def save_state(state):
         json.dump(state, f, indent=2)
 
 def import_file(file_path):
-    """Procesa un único archivo JSON exportado desde el móvil y acumula minutos del mismo día."""
+    """Procesa un único JSON exportado desde el móvil y acumula minutos del mismo día."""
     state = load_state()
     with open(file_path, "r", encoding="utf-8") as f:
         payload = json.load(f)
@@ -26,19 +26,6 @@ def import_file(file_path):
     payload.setdefault("food_ok", False)
     payload.setdefault("sleep_ok", False)
 
-    # --- Acumular minutos de sesiones del mismo día ---
-    for s in payload.get("sessions", []):
-        area = s["area"]
-        task = s["task"]
-        mins = s["minutes"]
-        date = s["date"]
-
-        area_state = state["areas"].setdefault(area, {})
-        area_state.setdefault("sessions", {})
-        area_state["sessions"].setdefault(date, {})
-        area_state["sessions"][date][task] = area_state["sessions"][date].get(task, 0) + mins
-
-    # --- Calcular XP y actualizar estado usando el payload completo ---
     updated = compute_day(state, payload)
     save_state(updated)
     print(f"✅ Datos actualizados desde {os.path.basename(file_path)}")
