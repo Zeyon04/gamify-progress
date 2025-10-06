@@ -72,12 +72,25 @@ def compute_day(state, payload):
     food_ok = payload.get("food_ok", False)
     sleep_ok = payload.get("sleep_ok", False)
 
-    # --- Agrupar minutos por área ---
+    # --- Agrupar minutos por área y tarea, acumulando con lo que ya había ese día ---
     minutes_by_area = {a: {} for a in AREA_TASKS}
+
     for s in sessions:
-        area, task, mins = s["area"], s["task"], s["minutes"]
-        minutes_by_area.setdefault(area, {})
-        minutes_by_area[area][task] = minutes_by_area[area].get(task, 0) + mins
+        area = s["area"]
+        task = s["task"]
+        mins = s["minutes"]
+
+        # Asegurarse de que la estructura existe en state
+        area_state = state["areas"].setdefault(area, {})
+        area_state.setdefault("sessions", {})
+        area_state["sessions"].setdefault(date, {})
+
+        # Acumular minutos del mismo día y tarea
+        previous = area_state["sessions"][date].get(task, 0)
+        area_state["sessions"][date][task] = previous + mins
+
+        # Guardamos también en minutes_by_area para cálculos de XP del día
+        minutes_by_area[area][task] = area_state["sessions"][date][task]
 
     # --- Bufo global para este día ---
     global_buff = 0.0
@@ -98,7 +111,7 @@ def compute_day(state, payload):
             buff_area += buff_task(t, mins)
 
         # Aplicar buffo: sube la tasa del área
-        area_state["rate"] = min(area_state["rate"] + buff_area, MAX_RATE)
+        area_state["rate"] = min(area_state.get("rate", BASE_RATE) + buff_area, MAX_RATE)
 
         # Comprobar si se cumplieron los mínimos
         if not required_met(area, tasks):
@@ -122,9 +135,9 @@ def compute_day(state, payload):
         area_state["xp"] += xp_gained
 
         # Subida de nivel
-        while area_state["xp"] >= level_xp_required(area_state["level"]):
-            area_state["xp"] -= level_xp_required(area_state["level"])
-            area_state["level"] += 1
+        while area_state["xp"] >= level_xp_required(area_state.get("level", 1)):
+            area_state["xp"] -= level_xp_required(area_state.get("level", 1))
+            area_state["level"] = area_state.get("level", 1) + 1
 
     state["last_date"] = date
     return state
