@@ -14,16 +14,13 @@ taskButtons.forEach(btn => {
     const task = btn.dataset.task;
     const area = btn.dataset.area;
 
-    // Si ya estaba activa, detener
     if (currentTask && currentTask.btn === btn) {
       stopTask();
       return;
     }
 
-    // Detener otra tarea si hay
     if (currentTask) stopTask();
 
-    // Iniciar nueva tarea
     currentTask = { task, area, btn };
     taskStart = Date.now();
     btn.classList.add("active");
@@ -46,7 +43,6 @@ function stopTask() {
   const today = now.toISOString().slice(0,10);
   const timestamp = now.toISOString().slice(11,19);
 
-  // Guardar o actualizar si es mayor
   let existing = sessions.find(s => s.date === today && s.task === currentTask.task);
   if (!existing || mins > existing.minutes) {
     if (existing) existing.minutes = mins;
@@ -83,7 +79,6 @@ function stopSleep() {
   sleepBtn.classList.remove("active");
   sleepBtn.querySelector(".timer").innerText = "00:00:00";
 
-  // Guardar sueño como sesión "sleep"
   const now = new Date();
   const today = now.toISOString().slice(0,10);
   const timestamp = now.toISOString().slice(11,19);
@@ -98,6 +93,8 @@ function stopSleep() {
 }
 
 // --- Exportar ---
+document.getElementById("exportBtn").addEventListener("click", exportToday);
+
 function exportToday() {
   const today = new Date().toISOString().slice(0,10);
   const todays = [];
@@ -113,7 +110,7 @@ function exportToday() {
   });
 
   const food_ok = document.getElementById("food").checked;
-  const sleep_ok = document.getElementById("sleepBtn").classList.contains("active") ? false : todays.some(t => t.task === "dormir" && t.minutes >= 480);
+  const sleep_ok = todays.some(t => t.task === "dormir" && t.minutes >= 480);
   const dinner_ok = document.getElementById("dinner").checked;
 
   const payload = { user: "oscar", date: today, sessions: todays, food_ok, dinner_ok, sleep_ok };

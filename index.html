@@ -18,7 +18,7 @@
       margin-bottom: 1rem;
     }
 
-    .tasks {
+    .tasks, .sleep-section {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
@@ -43,6 +43,10 @@
       background-color: #0288d1;
     }
 
+    button.task-btn:hover {
+      transform: scale(1.02);
+    }
+
     button.task-btn span.timer {
       position: absolute;
       right: 1rem;
@@ -55,13 +59,14 @@
 
     .checklist label {
       display: block;
-      font-size: 1rem;
+      font-size: 1.2rem;
       margin-bottom: 0.5rem;
     }
 
     .checklist input {
-      transform: scale(1.3);
+      transform: scale(1.5);
       margin-right: 0.5rem;
+      cursor: pointer;
     }
 
     .status {
@@ -71,20 +76,40 @@
       font-size: 1.1rem;
     }
 
-    .sleep-section {
-      margin-top: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
     .sleep-section button {
       width: 95%;
       background-color: #81c784;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      border: none;
+      padding: 1rem;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
     .sleep-section button.active {
       background-color: #388e3c;
+    }
+
+    .sleep-section button:hover {
+      transform: scale(1.02);
+    }
+
+    #exportBtn {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      background-color: #ffb74d;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: block;
+      margin: 1rem auto;
+    }
+
+    #exportBtn:hover {
+      transform: scale(1.05);
     }
   </style>
 </head>
@@ -111,6 +136,9 @@
   <div class="sleep-section">
     <button id="sleepBtn">🛌 Dormir <span class="timer">00:00:00</span></button>
   </div>
+
+  <!-- Botón exportar -->
+  <button id="exportBtn">💾 Exportar</button>
 
   <div class="status" id="status">Esperando...</div>
 
