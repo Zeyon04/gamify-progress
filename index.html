@@ -17,7 +17,7 @@
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
-      min-height: 100vh; /* 🔧 cubre toda la pantalla */
+      min-height: 100vh; /* 🔧 CAMBIO: fuerza a ocupar toda la altura de la pantalla */
     }
 
     h2 {
@@ -28,9 +28,8 @@
       text-align: center;
     }
 
-    /* Botones principales y half-btn */
-    .task-btn,
-    .half-btn {
+    /* Botones principales */
+    .task-btn {
       width: 95%;
       display: flex;
       justify-content: space-between;
@@ -44,39 +43,21 @@
       cursor: pointer;
       background: linear-gradient(90deg, #7b2fff, #4a00e0);
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.1s, box-shadow 0.2s;
       font-family: 'Krona One', sans-serif;
-
-      /* 🔧 Animación suave para hover/active */
-      transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.25s ease;
-      outline: none; /* 🔧 quita borde azul al hacer click */
     }
 
-    .task-btn.active,
-    .half-btn.active {
+    .task-btn.active {
       filter: brightness(1.2);
       box-shadow: 0 0 15px #a64eff;
       transform: scale(1.02);
     }
 
-    .task-btn:hover,
-    .half-btn:hover {
+    .task-btn:hover {
       transform: scale(1.03);
-      box-shadow: 0 0 15px rgba(123, 47, 255, 0.6); /* 🔧 glow púrpura */
-      filter: brightness(1.1);
     }
 
-    .task-btn:active,
-    .half-btn:active {
-      transform: scale(0.97); /* 🔧 efecto push al presionar */
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-
-    #exportBtn {
-      background: linear-gradient(90deg, #ff7a00, #ff4500);
-    }
-
-    .task-btn span,
-    .half-btn span {
+    .task-btn span {
       text-align: left;
     }
 
@@ -93,22 +74,53 @@
       margin-left: 1rem;
     }
 
-    /* 🔧 Cronómetro dormir debajo del texto */
+    /* Sección inferior con dormir/exportar + checks */
+    .bottom-row {
+      width: 95%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.6rem;
+      gap: 0.4rem;
+    }
+
+    .half-btn {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1.2rem;
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: linear-gradient(90deg, #7b2fff, #4a00e0);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.1s, box-shadow 0.2s;
+      font-family: 'Krona One', sans-serif;
+    }
+
+    #exportBtn {
+      background: linear-gradient(90deg, #ff7a00, #ff4500);
+    }
+
+    .half-btn:hover {
+      transform: scale(1.03);
+    }
+
+    .half-btn span {
+      text-align: left;
+    }
+
+    /* 🔧 CAMBIO: estilo específico para el cronómetro del botón DORMIR */
     #sleepBtn span {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: flex-start; /* texto y cronómetro alineados a la izquierda */
     }
 
-    #sleepBtn .timer {
-      display: block;
-      margin-top: 0.2rem;
-      text-align: left;
-      font-size: 0.75rem;
-      opacity: 0.85;
-    }
-
-    /* Checkboxes */
+    /* Checkbox personalizadas */
     .checklist-right {
       display: flex;
       flex-direction: column;
@@ -124,6 +136,7 @@
       cursor: pointer;
       user-select: none;
       position: relative;
+      padding-left: 0;
     }
 
     .custom-check input {
@@ -132,25 +145,33 @@
       pointer-events: none;
     }
 
-    .check-container {
+    .check-icon {
+      width: 22px;
+      height: 22px;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+      filter: brightness(0) invert(1); /* 🔧 CAMBIO: fuerza los iconos a blanco */
+    }
+
+    .custom-check .check-container {
       position: relative;
       width: 22px;
       height: 22px;
       flex-shrink: 0;
     }
 
-    .check-container img {
+    .custom-check .check-container .off,
+    .custom-check .check-container .on {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+      width: 22px;
+      height: 22px;
       transition: opacity 0.2s;
-      filter: brightness(0) invert(1); /* 🔧 iconos blancos */
+      filter: brightness(0) invert(1); /* 🔧 CAMBIO: blanco también aquí */
     }
 
-    .check-container .on {
+    .custom-check .check-container .on {
       opacity: 0;
     }
 
@@ -208,6 +229,7 @@
   <div class="bottom-row">
     <div style="display: flex; flex-direction: column; gap: 0.4rem; flex: 1;">
       <button id="sleepBtn" class="half-btn">
+        <!-- 🔧 CAMBIO: texto y cronómetro en columna -->
         <span>DORMIR<span class="timer">00:00:00</span></span>
         <img src="iconos/dormir.svg" class="task-icon" alt="">
       </button>
