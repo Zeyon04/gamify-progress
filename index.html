@@ -80,6 +80,21 @@
       margin-left: 1rem;
     }
 
+    /* Botón dormir: cronómetro debajo del texto */
+    #sleepBtn span {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* izquierda */
+    }
+
+    #sleepBtn .timer {
+      display: block;
+      margin-top: 0.2rem;
+      text-align: left;
+      font-size: 0.75rem;
+      opacity: 0.85;
+    }
+
     /* Fila inferior con dormir/exportar + checkboxes */
     .bottom-row {
       width: 95%;
@@ -160,6 +175,7 @@
       height: 100%;
       object-fit: contain;
       transition: opacity 0.2s;
+      filter: brightness(1) invert(0); /* iconos blancos */
     }
 
     .check-container .on {
