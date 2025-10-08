@@ -7,138 +7,196 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(to bottom, #f0f8ff, #e0f7fa);
-      color: #222;
+      background: linear-gradient(180deg, #0c0c1d, #1e1e2f);
+      color: #fff;
+      margin: 0;
       padding: 1rem;
-    }
-
-    h2 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .tasks, .sleep-section {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+      align-items: center;
     }
 
-    button.task-btn {
+    .task-btn {
       width: 95%;
-      padding: 1rem;
-      font-size: 1.2rem;
-      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1.2rem;
       border: none;
-      border-radius: 10px;
-      background-color: #4fc3f7;
+      border-radius: 14px;
       color: #fff;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0.35rem 0;
       cursor: pointer;
-      position: relative;
-      transition: all 0.2s;
+      background: linear-gradient(90deg, #a100ff, #6f00ff);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.1s, box-shadow 0.2s;
     }
 
-    button.task-btn.active {
-      background-color: #0288d1;
-    }
-
-    button.task-btn:hover {
+    .task-btn.active {
+      filter: brightness(1.2);
+      box-shadow: 0 0 15px #a64eff;
       transform: scale(1.02);
     }
 
-    button.task-btn span.timer {
-      position: absolute;
-      right: 1rem;
-      font-weight: bold;
+    .task-btn:hover {
+      transform: scale(1.03);
     }
 
+    .task-btn span {
+      font-weight: 400;
+    }
+
+    .task-btn .timer {
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .task-icon {
+      font-size: 1.4rem;
+      opacity: 0.9;
+      margin-left: 0.8rem;
+    }
+
+    /* DORMIR */
+    #sleepBtn {
+      width: 95%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1.2rem;
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0.35rem 0;
+      cursor: pointer;
+      background: linear-gradient(90deg, #5a4fff, #7a60ff);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+
+    #sleepBtn.active {
+      filter: brightness(1.2);
+      box-shadow: 0 0 15px #837aff;
+      transform: scale(1.02);
+    }
+
+    /* EXPORTAR */
+    #exportBtn {
+      width: 95%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1.2rem;
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0.35rem 0;
+      cursor: pointer;
+      background: linear-gradient(90deg, #ff8c00, #ff5e00);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+
+    #exportBtn:hover {
+      transform: scale(1.03);
+    }
+
+    /* CHECKS */
     .checklist {
-      margin: 1rem 0;
+      width: 95%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+      margin-top: 0.4rem;
     }
 
     .checklist label {
-      display: block;
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      user-select: none;
     }
 
     .checklist input {
-      transform: scale(1.5);
-      margin-right: 0.5rem;
+      width: 20px;
+      height: 20px;
+      accent-color: #fff;
       cursor: pointer;
     }
 
     .status {
       text-align: center;
-      font-weight: bold;
       margin-top: 1rem;
-      font-size: 1.1rem;
+      font-size: 1rem;
+      opacity: 0.8;
     }
 
-    .sleep-section button {
-      width: 95%;
-      background-color: #81c784;
-      font-size: 1.2rem;
-      border-radius: 10px;
-      border: none;
-      padding: 1rem;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .sleep-section button.active {
-      background-color: #388e3c;
-    }
-
-    .sleep-section button:hover {
-      transform: scale(1.02);
-    }
-
-    #exportBtn {
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
-      border-radius: 10px;
-      background-color: #ffb74d;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: block;
-      margin: 1rem auto;
-    }
-
-    #exportBtn:hover {
-      transform: scale(1.05);
+    h2 {
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.8rem;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <h2>🎮 Gamify Progress</h2>
+  <h2>GAMIFY PROGRESS</h2>
 
   <!-- Botones de tareas -->
-  <div class="tasks">
-    <button class="task-btn" data-task="entrenar" data-area="ejercicio">🏋️ Entrenar <span class="timer">00:00:00</span></button>
-    <button class="task-btn" data-task="andar" data-area="ejercicio">🚶 Andar <span class="timer">00:00:00</span></button>
-    <button class="task-btn" data-task="estudiar" data-area="inteligencia">📚 Estudiar <span class="timer">00:00:00</span></button>
-    <button class="task-btn" data-task="meditar" data-area="salud_mental">🧘 Meditar <span class="timer">00:00:00</span></button>
-    <button class="task-btn" data-task="organizar" data-area="salud_mental">🗂️ Organizar <span class="timer">00:00:00</span></button>
-    <button class="task-btn" data-task="lectura" data-area="inteligencia">📖 Lectura <span class="timer">00:00:00</span></button>
-  </div>
+  <button class="task-btn" data-task="entrenar" data-area="ejercicio">
+    <span>ENTRENAR<br><span class="timer">00:00:00</span></span>
+    <span class="task-icon">🏋️‍♂️</span>
+  </button>
+
+  <button class="task-btn" data-task="andar" data-area="ejercicio">
+    <span>ANDAR<br><span class="timer">00:00:00</span></span>
+    <span class="task-icon">👣</span>
+  </button>
+
+  <button class="task-btn" data-task="estudiar" data-area="inteligencia">
+    <span>ESTUDIAR<br><span class="timer">00:00:00</span></span>
+    <span class="task-icon">📝</span>
+  </button>
+
+  <button class="task-btn" data-task="meditar" data-area="salud_mental">
+    <span>MEDITAR<br><span class="timer">00:00:00</span></span>
+    <span class="task-icon">🧘</span>
+  </button>
+
+  <button class="task-btn" data-task="organizar" data-area="salud_mental">
+    <span>ORGANIZAR<br><span class="timer">00:00:00</span></span>
+    <span class="task-icon">📁</span>
+  </button>
+
+  <button class="task-btn" data-task="lectura" data-area="inteligencia">
+    <span>LEER<br><span class="timer">00:00:00</span></span>
+    <span class="task-icon">📚</span>
+  </button>
+
+  <!-- Dormir -->
+  <button id="sleepBtn">
+    <span>DORMIR<br><span class="timer">00:00:00</span></span>
+    <span class="task-icon">🛏️</span>
+  </button>
 
   <!-- Checklist comida/cena -->
   <div class="checklist">
-    <label><input type="checkbox" id="food"> 🍎 Comida OK</label>
-    <label><input type="checkbox" id="dinner"> 🍽️ Cena OK</label>
+    <label>COMER <input type="checkbox" id="food"></label>
+    <label>CENAR <input type="checkbox" id="dinner"></label>
   </div>
 
-  <!-- Cronómetro dormir -->
-  <div class="sleep-section">
-    <button id="sleepBtn">🛌 Dormir <span class="timer">00:00:00</span></button>
-  </div>
-
-  <!-- Botón exportar -->
-  <button id="exportBtn">💾 Exportar</button>
+  <!-- Exportar -->
+  <button id="exportBtn">
+    <span>EXPORTAR</span>
+    <span class="task-icon">⬇️</span>
+  </button>
 
   <div class="status" id="status">Esperando...</div>
 
