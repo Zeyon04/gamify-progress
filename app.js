@@ -40,8 +40,8 @@ function stopTask() {
   const elapsed = Date.now() - taskStart;
   const mins = Math.max(1, Math.round(elapsed / 60000));
   const now = new Date();
-  const today = now.toLocaleDateString('sv-SE'); // YYYY-MM-DD local
-  const timestamp = now.toLocaleTimeString('es-ES', { hour12: false }); // HH:MM:SS local
+  const today = now.toLocaleDateString('sv-SE');
+  const timestamp = now.toLocaleTimeString('es-ES', { hour12: false });
 
   let existing = sessions.find(s => s.date === today && s.task === currentTask.task);
   if (!existing || mins > existing.minutes) {
@@ -98,9 +98,7 @@ document.getElementById("exportBtn").addEventListener("click", exportToday);
 function exportToday() {
   const now = new Date();
   const today = now.toLocaleDateString('sv-SE');
-
-  // Hora local
-  const localTime = now.toLocaleTimeString('es-ES', { hour12: false }); // "HH:MM:SS"
+  const localTime = now.toLocaleTimeString('es-ES', { hour12: false });
 
   const todays = [];
   sessions.forEach(s => {
@@ -114,8 +112,8 @@ function exportToday() {
   });
 
   const food_ok = document.getElementById("food").checked;
-  const sleep_ok = todays.some(t => t.task === "dormir" && t.minutes >= 480);
   const dinner_ok = document.getElementById("dinner").checked;
+  const sleep_ok = todays.some(t => t.task === "dormir" && t.minutes >= 480);
 
   const payload = { user: "oscar", date: today, time: localTime, sessions: todays, food_ok, dinner_ok, sleep_ok, processed: false };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -127,32 +125,32 @@ function exportToday() {
   document.body.removeChild(a);
   URL.revokeObjectURL(a.href);
 
-  // Popup amarillo
+  // Popup naranja degradado
   const popup = document.createElement("div");
   popup.style.position = "fixed";
   popup.style.top = "50%";
   popup.style.left = "50%";
   popup.style.transform = "translate(-50%, -50%)";
-  popup.style.background = "#FFD700";  // amarillo
-  popup.style.color = "#000";          // texto negro
-  popup.style.padding = "1.5rem 2rem";
-  popup.style.borderRadius = "12px";
-  popup.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+  popup.style.background = "linear-gradient(90deg, #ff7a00, #ff4500)";
+  popup.style.color = "#fff";
+  popup.style.padding = "1.2rem 2rem";
+  popup.style.borderRadius = "14px";
+  popup.style.boxShadow = "0 5px 15px rgba(0,0,0,0.4)";
   popup.style.zIndex = "1000";
   popup.style.textAlign = "center";
-  popup.style.fontSize = "1.2rem";
-  popup.innerHTML = `🎉 Felicidades, progreso actualizado!\n<br><br>` +
-                    todays.map(s => `${s.task}: ${s.minutes} min`).join("<br>") +
-                    (food_ok ? "<br>Comida OK ✅" : "") +
-                    (dinner_ok ? "<br>Cena OK ✅" : "") +
-                    (sleep_ok ? "<br>Sueño OK ✅" : "");
+  popup.style.fontSize = "0.95rem";
+  popup.style.fontFamily = "'Krona One', sans-serif";
+
+  popup.innerHTML = `
+    <strong>🎉 Progreso actualizado</strong><br><br>
+    ${todays.map(s => `${s.task}: ${s.minutes} min`).join("<br>")}
+    ${food_ok ? "<br>Comida OK ✅" : ""}
+    ${dinner_ok ? "<br>Cena OK ✅" : ""}
+    ${sleep_ok ? "<br>Sueño OK ✅" : ""}
+  `;
 
   document.body.appendChild(popup);
-
-  setTimeout(() => {
-    popup.remove();
-  }, 3500);
-
+  setTimeout(() => popup.remove(), 3500);
   updateStatus("Archivo exportado ✅");
 }
 
