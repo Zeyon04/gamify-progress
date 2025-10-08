@@ -142,16 +142,16 @@ function exportToday() {
   popup.style.fontFamily = "'Krona One', sans-serif";
 
   popup.innerHTML = `
-    <strong>🎉 Progreso actualizado</strong><br><br>
+    <strong>Progreso actualizado</strong><br><br>
     ${todays.map(s => `${s.task}: ${s.minutes} min`).join("<br>")}
-    ${food_ok ? "<br>Comida OK ✅" : ""}
-    ${dinner_ok ? "<br>Cena OK ✅" : ""}
-    ${sleep_ok ? "<br>Sueño OK ✅" : ""}
+    ${food_ok ? "<br>Comida: OK" : ""}
+    ${dinner_ok ? "<br>Cena: OK" : ""}
+    ${sleep_ok ? "<br>Sueño: OK" : ""}
   `;
 
   document.body.appendChild(popup);
   setTimeout(() => popup.remove(), 3500);
-  updateStatus("Archivo exportado ✅");
+  updateStatus("Archivo exportado");
 }
 
 // --- Helpers ---
