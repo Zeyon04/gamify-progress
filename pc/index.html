@@ -1,40 +1,97 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Progreso OSCAR</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OSCAR — Progress</title>
+
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Krona+One&family=Montserrat:wght@300;600;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="header">OSCAR</div>
-  <div class="container">
-    <div class="menu">
-      <div class="daily-minutes">
-        <div>Minutos hoy</div>
-        <div id="minutesToday">0</div>
+  <header class="top-header">
+    <div class="logo">OSCAR</div>
+  </header>
+
+  <main class="main-grid">
+    <!-- LEFT: fecha + resumen diario -->
+    <section class="left-panel">
+      <div class="big-date" id="bigDate">08/10/2025</div>
+
+      <div class="today-list">
+        <div class="today-row"><span>ENTRENAR:</span> <span id="m_entrenar">0 min</span></div>
+        <div class="today-row"><span>ANDAR:</span> <span id="m_andar">0 min</span></div>
+        <div class="today-row"><span>ESTUDIAR:</span> <span id="m_estudiar">0 min</span></div>
+        <div class="today-row"><span>MEDITAR:</span> <span id="m_meditar">0 min</span></div>
+        <div class="today-row"><span>ORGANIZAR:</span> <span id="m_organizar">0 min</span></div>
+        <div class="today-row"><span>LEER:</span> <span id="m_lectura">0 min</span></div>
+        <div class="today-row total"><span>TOTALES:</span> <span id="minutesToday">0 min</span></div>
+
+        <div class="data-row">
+          <span>COMIDAS:</span> <span id="comidas_ok">--</span>
+        </div>
+        <div class="data-row">
+        <span>DORMIR:</span> <span id="dormir_ok">--</span>
+        </div>
       </div>
-      <div class="bars">
-        <div class="bar-label">Ejercicio</div>
-        <div class="bar-bg"><div id="barEjercicio" class="bar-fill"></div></div>
+    </section>
 
-        <div class="bar-label">Inteligencia</div>
-        <div class="bar-bg"><div id="barInteligencia" class="bar-fill"></div></div>
-
-        <div class="bar-label">Salud Mental</div>
-        <div class="bar-bg"><div id="barSalud" class="bar-fill"></div></div>
+    <!-- RIGHT TOP: gráfico semanal -->
+    <section class="right-top">
+      <canvas id="weeklyChart" height="220"></canvas>
+      <div class="chart-legend">
+        <div><span class="dot intel"></span> Inteligencia</div>
+        <div><span class="dot ejerc"></span> Ejercicio</div>
+        <div><span class="dot mental"></span> Salud Mental</div>
       </div>
-    </div>
+    </section>
 
-    <div class="chart-container">
-      <select id="chartView">
-        <option value="daily">Diario</option>
-        <option value="monthly">Mensual</option>
-      </select>
-      <canvas id="xpChart"></canvas>
-    </div>
-  </div>
-  <script src="app.js"></script>
+    <!-- BOTTOM: Niveles -->
+    <section class="levels">
+      <h2>NIVELES</h2>
+
+      <div class="xp-row" data-area="inteligencia">
+        <div class="xp-label">INTELIGENCIA</div>
+        <div class="xp-bar">
+          <div class="xp-fill intel-fill" style="width:0%"></div>
+        </div>
+        <div class="xp-info">
+          <div class="lvl" id="lvl_inteligencia">Lvl. 1</div>
+          <div class="exp" id="exp_inteligencia">0 / 50</div>
+          <div class="rate" id="rate_inteligencia">Rate: 100%</div>
+        </div>
+      </div>
+
+      <div class="xp-row" data-area="ejercicio">
+        <div class="xp-label">EJERCICIO</div>
+        <div class="xp-bar">
+          <div class="xp-fill ejerc-fill" style="width:0%"></div>
+        </div>
+        <div class="xp-info">
+          <div class="lvl" id="lvl_ejercicio">Lvl. 1</div>
+          <div class="exp" id="exp_ejercicio">0 / 50</div>
+          <div class="rate" id="rate_ejercicio">Rate: 100%</div>
+        </div>
+      </div>
+
+      <div class="xp-row" data-area="salud_mental">
+        <div class="xp-label">SALUD MENTAL</div>
+        <div class="xp-bar">
+          <div class="xp-fill mental-fill" style="width:0%"></div>
+        </div>
+        <div class="xp-info">
+          <div class="lvl" id="lvl_salud_mental">Lvl. 1</div>
+          <div class="exp" id="exp_salud_mental">0 / 50</div>
+          <div class="rate" id="rate_salud_mental">Rate: 100%</div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="display.js"></script>
 </body>
 </html>

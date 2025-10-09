@@ -1,0 +1,18 @@
+{
+  "user": "oscar",
+  "date": "2025-10-08",
+  "time": "22:52:31",
+  "sessions": [
+    {
+      "date": "2025-10-08",
+      "time": "22:52:29",
+      "area": "ejercicio",
+      "task": "entrenar",
+      "minutes": 1
+    }
+  ],
+  "food_ok": true,
+  "dinner_ok": true,
+  "sleep_ok": false,
+  "processed": true
+}

@@ -3,23 +3,29 @@
     "inteligencia": {
       "xp": 0,
       "level": 1,
-      "rate": 1.0,
+      "rate": 0.9,
       "sessions": {}
     },
     "ejercicio": {
       "xp": 0,
       "level": 1,
-      "rate": 1.0,
-      "sessions": {}
+      "rate": 0.9,
+      "sessions": {
+        "2025-10-08": {
+          "entrenar": 4
+        }
+      }
     },
     "salud_mental": {
       "xp": 0,
       "level": 1,
-      "rate": 1.0,
+      "rate": 0.9,
       "sessions": {}
     }
   },
-  "last_processed_date": "2025-10-06",
-  "food_log": {},
+  "last_processed_date": "2025-10-08",
+  "food_log": {
+    "2025-10-08": true
+  },
   "sleep_log": {}
 }
